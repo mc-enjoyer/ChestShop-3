@@ -13,8 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
+
 import org.bukkit.event.block.SignChangeEvent;
 
 /**
@@ -82,39 +81,7 @@ public class StockColorListener implements Listener {
         }
     }
     
-    /**
-     * Update sign color when items are moved in a container
-     * 
-     * @param event The inventory click event
-     */
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onInventoryClick(InventoryClickEvent event) {
-        if (!Properties.ENABLE_STOCK_COLOR_INDICATORS) {
-            return;
-        }
-        
-        if (event.getInventory().getHolder() instanceof Chest) {
-            Chest chest = (Chest) event.getInventory().getHolder();
-            updateSignColorForChest(chest);
-        }
-    }
-    
-    /**
-     * Update sign color when items are dragged in a container
-     * 
-     * @param event The inventory drag event
-     */
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onInventoryDrag(InventoryDragEvent event) {
-        if (!Properties.ENABLE_STOCK_COLOR_INDICATORS) {
-            return;
-        }
-        
-        if (event.getInventory().getHolder() instanceof Chest) {
-            Chest chest = (Chest) event.getInventory().getHolder();
-            updateSignColorForChest(chest);
-        }
-    }
+
     
     /**
      * Update sign color when a sign is changed/created
@@ -144,25 +111,5 @@ public class StockColorListener implements Listener {
         }
     }
     
-    /**
-     * Helper method to update sign color for a chest
-     * 
-     * @param chest The chest to find connected signs for
-     */
-    private void updateSignColorForChest(Chest chest) {
-        Sign sign = uBlock.getConnectedSign(chest);
-        
-        if (sign != null && ChestShopSign.isValid(sign)) {
-            // Schedule the update for the next tick to ensure inventory changes are processed
-            ChestShop.getBukkitServer().getScheduler().runTask(ChestShop.getPlugin(), new Runnable() {
-                @Override
-                public void run() {
-                    StockColorUtil.updateSignColor(sign);
-                }
-            });
-        } else {
-            // Debug: Log when we can't find a valid sign
-            ChestShop.getBukkitLogger().fine("Could not find valid sign for chest at " + chest.getLocation());
-        }
-    }
+
 } 

@@ -51,10 +51,9 @@ STOCK_COLOR_BATCH_SIZE: 10
 
 ### Update Triggers
 1. **Sign Creation**: Colors are set when a new shop is created (handles both ShopCreatedEvent and SignChangeEvent)
-2. **Inventory Changes**: Colors update when items are moved in chests
-3. **Transaction Events**: Colors update immediately after buy/sell transactions
-4. **Periodic Updates**: Background task checks all signs every 30 seconds
-5. **Manual Updates**: Admin command for immediate updates
+2. **Transaction Events**: Colors update immediately after buy/sell transactions
+3. **Periodic Updates**: Background task checks all signs every 30 seconds
+4. **Manual Updates**: Admin command for immediate updates
 
 ### Performance Optimization
 - **Batch Processing**: Signs are updated in small groups to prevent lag
@@ -82,7 +81,6 @@ STOCK_COLOR_BATCH_SIZE: 10
 
 2. **StockColorListener.java** - Event listener
    - Handles sign creation events (ShopCreatedEvent and SignChangeEvent)
-   - Handles inventory click/drag events
    - Handles transaction events (buy/sell)
    - Schedules updates for the next tick
 
@@ -98,9 +96,8 @@ STOCK_COLOR_BATCH_SIZE: 10
 ### Event Flow
 
 1. **Sign Creation**: `ShopCreatedEvent`/`SignChangeEvent` → `StockColorListener` → `StockColorUtil.updateSignColor()`
-2. **Inventory Changes**: `InventoryClickEvent`/`InventoryDragEvent` → `StockColorListener` → `StockColorUtil.updateSignColor()`
-3. **Transaction**: `TransactionEvent` → `StockColorListener` → `StockColorUtil.updateSignColor()`
-4. **Periodic Update**: `StockColorUpdateTask` → `StockColorUtil.updateSignColorsBatch()`
+2. **Transaction**: `TransactionEvent` → `StockColorListener` → `StockColorUtil.updateSignColor()`
+3. **Periodic Update**: `StockColorUpdateTask` → `StockColorUtil.updateSignColorsBatch()`
 
 ## Benefits
 
