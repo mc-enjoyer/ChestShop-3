@@ -116,7 +116,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
-                    <finalName>ChestShop</finalName>
+                    <finalName>ChestShop-${project.version}</finalName>
                 </configuration>
             </plugin>
             <plugin>

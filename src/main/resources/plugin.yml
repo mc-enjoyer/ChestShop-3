@@ -31,6 +31,9 @@ commands:
     aliases: [chestshop]
     description: Shows the ChestShop's version
     usage: /<command>
+  csReloadSigns:
+    description: Reloads all saved ChestShop signs from storage
+    usage: /<command>
 
 permissions:
   ChestShop.*:

@@ -82,6 +82,12 @@ public class ChestShop extends JavaPlugin {
         Configuration.pairFileAndClass(loadFile("local.yml"), Messages.class);
 
         itemDatabase = new ItemDatabase();
+        
+        // Initialize sign storage system
+        com.Acrobot.ChestShop.Utils.SignStorage.initialize();
+        
+        // Load all saved signs on startup
+        loadSavedSigns();
 
         uName.file = loadFile("longName.storage");
         uName.load();
@@ -118,6 +124,7 @@ public class ChestShop extends JavaPlugin {
         getCommand("iteminfo").setExecutor(new ItemInfo());
         getCommand("csVersion").setExecutor(new Version());
         getCommand("csGive").setExecutor(new Give());
+        getCommand("csReloadSigns").setExecutor(new com.Acrobot.ChestShop.Commands.ReloadSigns());
     }
 
     public static File loadFile(String string) {
@@ -189,6 +196,7 @@ public class ChestShop extends JavaPlugin {
 
         registerEvent(new RestrictedSign());
         registerEvent(new ShortNameSaver());
+        registerEvent(new com.Acrobot.ChestShop.Listeners.SignStorageListener());
 
         if (!Properties.TURN_OFF_HOPPER_PROTECTION) {
             registerEvent(new ItemMoveListener());
@@ -245,6 +253,7 @@ public class ChestShop extends JavaPlugin {
         registerEvent(new ItemManager());
         registerEvent(new TransactionLogger());
         registerEvent(new TransactionMessageSender());
+        registerEvent(new SignStorageTransactionListener());
     }
 
     private void registerModules() {
@@ -345,5 +354,22 @@ public class ChestShop extends JavaPlugin {
 
     public static void callEvent(Event event) {
         Bukkit.getPluginManager().callEvent(event);
+    }
+    
+    /**
+     * Load all saved signs from the storage file and log the results
+     */
+    private void loadSavedSigns() {
+        try {
+            List<org.bukkit.block.Sign> validSigns = com.Acrobot.ChestShop.Utils.SignStorage.getValidSigns();
+            logger.info("Loaded " + validSigns.size() + " valid ChestShop signs from storage");
+            
+            for (org.bukkit.block.Sign sign : validSigns) {
+                logger.info("Found valid shop sign at " + sign.getLocation() + 
+                    " owned by " + sign.getLine(0));
+            }
+        } catch (Exception e) {
+            logger.severe("Failed to load saved signs: " + e.getMessage());
+        }
     }
 }
