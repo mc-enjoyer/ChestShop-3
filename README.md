@@ -42,6 +42,7 @@ Building
 To build ChestShop, you'll need a Maven installation.
 * [Maven download](http://maven.apache.org/download.cgi)
 * Launch `mvn clean install` -- that's it!
+* The built jar will be named `ChestShop-{version}.jar` (e.g., `ChestShop-3.7.9.jar`)
 
 Pre-build versions can also be found on the [Jenkins server](https://ci.minebench.de/job/ChestShop-3/).
 

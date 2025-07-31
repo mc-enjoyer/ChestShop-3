@@ -2,68 +2,70 @@ package com.Acrobot.ChestShop.Listeners.Block.Break;
 
 import com.Acrobot.Breeze.Utils.BlockUtil;
 import com.Acrobot.ChestShop.ChestShop;
-import com.Acrobot.ChestShop.Configuration.Messages;
 import com.Acrobot.ChestShop.Configuration.Properties;
 import com.Acrobot.ChestShop.Events.ShopDestroyedEvent;
-import com.Acrobot.ChestShop.Listeners.Block.Break.Attached.PhysicsBreak;
+import com.Acrobot.ChestShop.Permission;
 import com.Acrobot.ChestShop.Signs.ChestShopSign;
-import com.Acrobot.ChestShop.UUIDs.NameManager;
 import com.Acrobot.ChestShop.Utils.uBlock;
+import com.google.common.collect.Lists;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Container;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.material.Directional;
+import org.bukkit.material.PistonBaseMaterial;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.Acrobot.Breeze.Utils.ImplementationAdapter.getState;
-import static com.Acrobot.Breeze.Utils.BlockUtil.getAttachedBlock;
+import static com.Acrobot.Breeze.Utils.BlockUtil.getAttachedFace;
 import static com.Acrobot.Breeze.Utils.BlockUtil.isSign;
-import static com.Acrobot.ChestShop.Permission.OTHER_NAME_DESTROY;
+import static com.Acrobot.ChestShop.Permission.ADMIN;
+import static com.Acrobot.ChestShop.Permission.MOD;
+import static com.Acrobot.ChestShop.Signs.ChestShopSign.NAME_LINE;
+import static com.Acrobot.ChestShop.Utils.uName.canUseName;
 
 /**
  * @author Acrobot
  */
 public class SignBreak implements Listener {
     private static final BlockFace[] SIGN_CONNECTION_FACES = {BlockFace.SOUTH, BlockFace.NORTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP};
-    public static final String METADATA_NAME = "shop_destroyer";
+    private static final String METADATA_NAME = "shop_destroyer";
 
-    public SignBreak() {
-        try {
-            Class.forName("com.destroystokyo.paper.event.block.BlockDestroyEvent");
-            ChestShop.getPlugin().registerEvent((Listener) Class.forName("com.Acrobot.ChestShop.Listeners.Block.Break.Attached.PaperBlockDestroy").getDeclaredConstructor().newInstance());
-            ChestShop.getBukkitLogger().info("Using Paper's BlockDestroyEvent instead of the BlockPhysicsEvent!");
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
-            ChestShop.getPlugin().registerEvent(new PhysicsBreak());
-        }
-    }
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public static void onSign(BlockPhysicsEvent event) {
+        Block block = event.getBlock();
 
-    public static void handlePhysicsBreak(Block block) {
         if (!BlockUtil.isSign(block)) {
             return;
         }
 
-        Sign sign = (Sign) getState(block, false);
-        Block attachedBlock = BlockUtil.getAttachedBlock(sign);
+        Sign sign = (Sign) block.getState();
+        Block attachedBlock = BlockUtil.getAttachedFace(sign);
 
         if (attachedBlock.getType() == Material.AIR && ChestShopSign.isValid(sign)) {
-            sendShopDestroyedEvent((Sign) block.getState(), block.hasMetadata(METADATA_NAME)
-                    ? (Player) block.getMetadata(METADATA_NAME).get(0).value()
-                    : null);
+            List <MetadataValue> values = block.getMetadata(METADATA_NAME);
+
+            if (values.isEmpty()) {
+                return;
+            }
+
+            sendShopDestroyedEvent(sign, (Player) block.getMetadata(METADATA_NAME).get(0).value());
         }
     }
 
@@ -71,23 +73,19 @@ public class SignBreak implements Listener {
     public static void onSignBreak(BlockBreakEvent event) {
         if (!canBlockBeBroken(event.getBlock(), event.getPlayer())) {
             event.setCancelled(true);
-            Messages.ACCESS_DENIED.sendWithPrefix(event.getPlayer());
-            if (isSign(event.getBlock())) {
-                event.getBlock().getState().update();
-            }
         }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public static void onBrokenSign(BlockBreakEvent event) {
-        if (ChestShopSign.isValid(event.getBlock())) {
+        if (ChestShopSign.isValid(event.getBlock()) && !event.isCancelled()) {
             sendShopDestroyedEvent((Sign) event.getBlock().getState(), event.getPlayer());
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public static void onBlockPistonExtend(BlockPistonExtendEvent event) {
-        for (Block block : event.getBlocks()) {
+        for (Block block : getExtendBlocks(event)) {
             if (!canBlockBeBroken(block, null)) {
                 event.setCancelled(true);
                 return;
@@ -97,11 +95,8 @@ public class SignBreak implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public static void onBlockPistonRetract(BlockPistonRetractEvent event) {
-        for (Block block : event.getBlocks()) {
-            if (!canBlockBeBroken(block, null)) {
-                event.setCancelled(true);
-                return;
-            }
+        if (!canBlockBeBroken(getRetractBlock(event), null)) {
+            event.setCancelled(true);
         }
     }
 
@@ -119,20 +114,6 @@ public class SignBreak implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public static void onIgnite(BlockBurnEvent event) {
-        if (!canBlockBeBroken(event.getBlock(), null)) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public static void onEntityChangeBlock(EntityChangeBlockEvent event) {
-        if (!canBlockBeBroken(event.getBlock(), null)) {
-            event.setCancelled(true);
-        }
-    }
-
     public static boolean canBlockBeBroken(Block block, Player breaker) {
         List<Sign> attachedSigns = getAttachedSigns(block);
         List<Sign> brokenBlocks = new LinkedList<Sign>();
@@ -140,12 +121,13 @@ public class SignBreak implements Listener {
         boolean canBeBroken = true;
 
         for (Sign sign : attachedSigns) {
+            sign.update();
 
             if (!canBeBroken || !ChestShopSign.isValid(sign)) {
                 continue;
             }
 
-            if (Properties.TURN_OFF_SIGN_PROTECTION || canDestroyShop(breaker, ChestShopSign.getOwner(sign))) {
+            if (Properties.TURN_OFF_SIGN_PROTECTION || canDestroyShop(breaker, com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(sign.getLine(NAME_LINE)))) {
                 brokenBlocks.add(sign);
             } else {
                 canBeBroken = false;
@@ -164,23 +146,31 @@ public class SignBreak implements Listener {
     }
 
     private static boolean canDestroyShop(Player player, String name) {
-        return player != null && NameManager.canUseName(player, OTHER_NAME_DESTROY, name);
+        return player != null && (hasShopBreakingPermission(player) || canUseName(player, name));
     }
 
-    public static void sendShopDestroyedEvent(Sign sign, Player player) {
-        Container connectedContainer = uBlock.findConnectedContainer(sign.getBlock());
+    private static boolean hasShopBreakingPermission(Player player) {
+        return Permission.has(player, ADMIN) || Permission.has(player, MOD);
+    }
 
-        Event event = new ShopDestroyedEvent(player, sign, connectedContainer);
+    private static void sendShopDestroyedEvent(Sign sign, Player player) {
+        Chest connectedChest = null;
+
+        if (!ChestShopSign.isAdminShop(sign)) {
+            connectedChest = uBlock.findConnectedChest(sign.getBlock());
+        }
+
+        Event event = new ShopDestroyedEvent(player, sign, connectedChest);
         ChestShop.callEvent(event);
     }
 
     private static List<Sign> getAttachedSigns(Block block) {
         if (block == null) {
-            return new ArrayList<>();
+            return Lists.newArrayList();
         }
 
         if (isSign(block)) {
-            return Collections.singletonList((Sign) block.getState());
+            return Arrays.asList((Sign) block.getState());
         } else {
             List<Sign> attachedSigns = new LinkedList<Sign>();
 
@@ -193,12 +183,51 @@ public class SignBreak implements Listener {
 
                 Sign sign = (Sign) relative.getState();
 
-                if (getAttachedBlock(sign).equals(block)) {
+                if (getAttachedFace(sign).equals(block)) {
                     attachedSigns.add(sign);
                 }
             }
 
             return attachedSigns;
         }
+    }
+
+    private static Block getRetractBlock(BlockPistonRetractEvent event) {
+        Block block = getRetractLocationBlock(event);
+        return (block != null && !BlockUtil.isSign(block) ? block : null);
+    }
+
+    //Those are fixes for CraftBukkit's piston bug, where piston appears not to be a piston.
+    private static BlockFace getPistonDirection(Block block) {
+        return block.getState().getData() instanceof PistonBaseMaterial ? ((Directional) block.getState().getData()).getFacing() : null;
+    }
+
+    private static Block getRetractLocationBlock(BlockPistonRetractEvent event) {
+        BlockFace pistonDirection = getPistonDirection(event.getBlock());
+        return pistonDirection != null ? event.getBlock().getRelative((pistonDirection), 2).getLocation().getBlock() : null;
+    }
+
+    private static List<Block> getExtendBlocks(BlockPistonExtendEvent event) {
+        BlockFace pistonDirection = getPistonDirection(event.getBlock());
+
+        if (pistonDirection == null) {
+            return new ArrayList<Block>();
+        }
+
+        Block piston = event.getBlock();
+        List<Block> pushedBlocks = new ArrayList<Block>();
+
+        for (int currentBlock = 1; currentBlock < event.getLength() + 1; currentBlock++) {
+            Block block = piston.getRelative(pistonDirection, currentBlock);
+            Material blockType = block.getType();
+
+            if (blockType == Material.AIR) {
+                break;
+            }
+
+            pushedBlocks.add(block);
+        }
+
+        return pushedBlocks;
     }
 }

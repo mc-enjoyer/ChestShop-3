@@ -1,14 +1,10 @@
 package com.Acrobot.ChestShop.Listeners.PreShopCreation;
 
 import com.Acrobot.Breeze.Utils.PriceUtil;
-import com.Acrobot.ChestShop.Configuration.Properties;
 import com.Acrobot.ChestShop.Events.PreShopCreationEvent;
-import com.Acrobot.ChestShop.Signs.ChestShopSign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-
-import java.util.Locale;
 
 import static com.Acrobot.Breeze.Utils.PriceUtil.isPrice;
 import static com.Acrobot.ChestShop.Events.PreShopCreationEvent.CreationOutcome.INVALID_PRICE;
@@ -21,23 +17,15 @@ public class PriceChecker implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public static void onPreShopCreation(PreShopCreationEvent event) {
-        String line = ChestShopSign.getPrice(event.getSignLines()).toUpperCase(Locale.ROOT);
-        if (Properties.PRICE_PRECISION <= 0) {
-            line = line.replaceAll("\\.\\d*", ""); //remove too many decimal places
-        } else {
-            line = line.replaceAll("(\\.\\d{0," + Properties.PRICE_PRECISION + "})\\d*", "$1"); //remove too many decimal places
-        }
-        line = line.replaceAll("(\\.\\d*[1-9])0+", "$1"); //remove trailing zeroes
-        line = line.replaceAll("(\\d)\\.0+(\\D|$)", "$1$2"); //remove point and zeroes from strings that only have trailing zeros
+        String line = com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(event.getSignLine(PRICE_LINE)).toUpperCase();
+        String[] part = line.split(":");
 
-        String[] parts = line.split(":");
-
-        if (parts.length > 1 && (isInvalid(parts[0]) ^ isInvalid(parts[1]))) {
+        if (part.length > 1 && (isInvalid(part[0]) ^ isInvalid(part[1]))) {
             line = line.replace(':', ' ');
-            parts = new String[]{line};
+            part = new String[]{line};
         }
 
-        if (parts[0].split(" ").length > 2) {
+        if (part[0].split(" ").length > 2) {
             event.setOutcome(INVALID_PRICE);
             return;
         }
@@ -47,11 +35,11 @@ public class PriceChecker implements Listener {
             return;
         }
 
-        if (isPrice(parts[0])) {
+        if (isPrice(part[0])) {
             line = "B " + line;
         }
 
-        if (parts.length > 1 && isPrice(parts[1])) {
+        if (part.length > 1 && isPrice(part[1])) {
             line += " S";
         }
 
@@ -63,14 +51,6 @@ public class PriceChecker implements Listener {
             event.setOutcome(INVALID_PRICE);
             return;
         }
-
-        for (String part : parts) {
-            if (!PriceUtil.hasSingleMultiplier(part)) {
-                event.setOutcome(INVALID_PRICE);
-                return;
-            }
-        }
-
 
         event.setSignLine(PRICE_LINE, line);
 
