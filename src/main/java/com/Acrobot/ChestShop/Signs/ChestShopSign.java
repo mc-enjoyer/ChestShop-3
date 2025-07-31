@@ -40,7 +40,7 @@ public class ChestShopSign {
     }
 
     public static boolean isAdminShop(Sign sign) {
-        return isAdminShop(sign.getLine(NAME_LINE));
+        return isAdminShop(com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(sign.getLine(NAME_LINE)));
     }
 
     public static boolean isValid(Sign sign) {
@@ -48,7 +48,12 @@ public class ChestShopSign {
     }
 
     public static boolean isValid(String[] line) {
-        return isValidPreparedSign(line) && (line[PRICE_LINE].toUpperCase().contains("B") || line[PRICE_LINE].toUpperCase().contains("S")) && !line[NAME_LINE].isEmpty();
+        // Strip color codes from lines for validation
+        String[] cleanLines = new String[4];
+        for (int i = 0; i < 4; i++) {
+            cleanLines[i] = com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(line[i]);
+        }
+        return isValidPreparedSign(cleanLines) && (cleanLines[PRICE_LINE].toUpperCase().contains("B") || cleanLines[PRICE_LINE].toUpperCase().contains("S")) && !cleanLines[NAME_LINE].isEmpty();
     }
 
     public static boolean isValid(Block sign) {
@@ -81,7 +86,7 @@ public class ChestShopSign {
         if (player == null) return false;
         if (sign == null) return true;
 
-        return uName.canUseName(player, sign.getLine(0));
+        return uName.canUseName(player, com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(sign.getLine(0)));
     }
 
     public static boolean isValidPreparedSign(String[] lines) {

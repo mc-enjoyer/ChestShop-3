@@ -127,7 +127,7 @@ public class SignBreak implements Listener {
                 continue;
             }
 
-            if (Properties.TURN_OFF_SIGN_PROTECTION || canDestroyShop(breaker, sign.getLine(NAME_LINE))) {
+            if (Properties.TURN_OFF_SIGN_PROTECTION || canDestroyShop(breaker, com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(sign.getLine(NAME_LINE)))) {
                 brokenBlocks.add(sign);
             } else {
                 canBeBroken = false;

@@ -17,7 +17,7 @@ public class PriceChecker implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public static void onPreShopCreation(PreShopCreationEvent event) {
-        String line = event.getSignLine(PRICE_LINE).toUpperCase();
+        String line = com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(event.getSignLine(PRICE_LINE)).toUpperCase();
         String[] part = line.split(":");
 
         if (part.length > 1 && (isInvalid(part[0]) ^ isInvalid(part[1]))) {

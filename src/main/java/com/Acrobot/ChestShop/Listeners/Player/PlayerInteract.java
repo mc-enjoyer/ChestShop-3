@@ -110,10 +110,10 @@ public class PlayerInteract implements Listener {
     }
 
     private static PreTransactionEvent preparePreTransactionEvent(Sign sign, Player player, Action action) {
-        String name = sign.getLine(NAME_LINE);
-        String quantity = sign.getLine(QUANTITY_LINE);
-        String prices = sign.getLine(PRICE_LINE);
-        String material = sign.getLine(ITEM_LINE);
+        String name = com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(sign.getLine(NAME_LINE));
+        String quantity = com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(sign.getLine(QUANTITY_LINE));
+        String prices = com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(sign.getLine(PRICE_LINE));
+        String material = com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(sign.getLine(ITEM_LINE));
 
         String ownerName = uName.getName(name);
         OfflinePlayer owner = Bukkit.getOfflinePlayer(ownerName);

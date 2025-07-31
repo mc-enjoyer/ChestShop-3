@@ -125,6 +125,10 @@ public class ChestShop extends JavaPlugin {
         getCommand("csVersion").setExecutor(new Version());
         getCommand("csGive").setExecutor(new Give());
         getCommand("csReloadSigns").setExecutor(new com.Acrobot.ChestShop.Commands.ReloadSigns());
+        getCommand("csUpdateStockColors").setExecutor(new com.Acrobot.ChestShop.Commands.UpdateStockColors());
+        
+        // Start stock color update task
+        com.Acrobot.ChestShop.Listeners.StockColorUpdateTask.startTask();
     }
 
     public static File loadFile(String string) {
@@ -163,6 +167,9 @@ public class ChestShop extends JavaPlugin {
 
     public void onDisable() {
         getServer().getScheduler().cancelTasks(this);
+        
+        // Stop stock color update task
+        com.Acrobot.ChestShop.Listeners.StockColorUpdateTask.stopTask();
 
         if (handler != null) {
             handler.close();
@@ -197,6 +204,7 @@ public class ChestShop extends JavaPlugin {
         registerEvent(new RestrictedSign());
         registerEvent(new ShortNameSaver());
         registerEvent(new com.Acrobot.ChestShop.Listeners.SignStorageListener());
+        registerEvent(new com.Acrobot.ChestShop.Listeners.StockColorListener());
 
         if (!Properties.TURN_OFF_HOPPER_PROTECTION) {
             registerEvent(new ItemMoveListener());
@@ -366,7 +374,19 @@ public class ChestShop extends JavaPlugin {
             
             for (org.bukkit.block.Sign sign : validSigns) {
                 logger.info("Found valid shop sign at " + sign.getLocation() + 
-                    " owned by " + sign.getLine(0));
+                    " owned by " + com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(sign.getLine(0)));
+            }
+            
+            // Update initial stock colors if enabled
+            if (Properties.ENABLE_STOCK_COLOR_INDICATORS) {
+                logger.info("Updating initial stock colors for " + validSigns.size() + " signs");
+                for (org.bukkit.block.Sign sign : validSigns) {
+                    try {
+                        com.Acrobot.ChestShop.Utils.StockColorUtil.updateSignColor(sign);
+                    } catch (Exception e) {
+                        logger.warning("Failed to update initial color for sign at " + sign.getLocation() + ": " + e.getMessage());
+                    }
+                }
             }
         } catch (Exception e) {
             logger.severe("Failed to load saved signs: " + e.getMessage());

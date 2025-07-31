@@ -67,6 +67,6 @@ public class ChestShop implements Listener {
     }
 
     private static boolean isShopMember(Player player, Sign sign) {
-        return uName.canUseName(player, sign.getLine(0));
+        return uName.canUseName(player, com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(sign.getLine(0)));
     }
 }

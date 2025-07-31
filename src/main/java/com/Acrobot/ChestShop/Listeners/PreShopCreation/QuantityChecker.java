@@ -16,7 +16,7 @@ public class QuantityChecker implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public static void onPreShopCreation(PreShopCreationEvent event) {
-        String quantity = event.getSignLine(QUANTITY_LINE);
+        String quantity = com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(event.getSignLine(QUANTITY_LINE));
 
         if (!NumberUtil.isInteger(quantity)) {
             event.setOutcome(INVALID_QUANTITY);

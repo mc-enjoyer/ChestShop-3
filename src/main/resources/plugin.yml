@@ -34,6 +34,9 @@ commands:
   csReloadSigns:
     description: Reloads all saved ChestShop signs from storage
     usage: /<command>
+  csUpdateStockColors:
+    description: Manually updates stock colors for all ChestShop signs
+    usage: /<command>
 
 permissions:
   ChestShop.*:

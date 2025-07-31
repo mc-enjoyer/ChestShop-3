@@ -32,7 +32,7 @@ public class ReloadSigns implements CommandExecutor {
             } else {
                 sender.sendMessage("§eSign locations:");
                 for (org.bukkit.block.Sign sign : validSigns) {
-                    sender.sendMessage("§7- " + sign.getLocation() + " (Owner: " + sign.getLine(0) + ")");
+                    sender.sendMessage("§7- " + sign.getLocation() + " (Owner: " + com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(sign.getLine(0)) + ")");
                 }
             }
             

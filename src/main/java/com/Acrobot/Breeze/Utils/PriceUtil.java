@@ -20,7 +20,9 @@ public class PriceUtil {
      * @return price
      */
     public static double get(String text, char indicator) {
-        String[] split = text.replace(" ", "").toLowerCase().split(":");
+        // Strip color codes before parsing
+        String cleanText = org.bukkit.ChatColor.stripColor(text);
+        String[] split = cleanText.replace(" ", "").toLowerCase().split(":");
         String character = String.valueOf(indicator).toLowerCase();
 
         for (String part : split) {
@@ -106,10 +108,13 @@ public class PriceUtil {
      * @return Is the string a valid price
      */
     public static boolean isPrice(String text) {
-        if (NumberUtil.isDouble(text)) {
+        // Strip color codes before checking
+        String cleanText = org.bukkit.ChatColor.stripColor(text).trim();
+        
+        if (NumberUtil.isDouble(cleanText)) {
             return true;
         }
 
-        return text.trim().equalsIgnoreCase(FREE_TEXT);
+        return cleanText.equalsIgnoreCase(FREE_TEXT);
     }
 }

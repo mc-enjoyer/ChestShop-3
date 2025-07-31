@@ -143,16 +143,19 @@ public class MaterialUtil {
      * @return ItemStack
      */
     public static ItemStack getItem(String itemName) {
-        ItemStack itemStack = Odd.getFromString(itemName);
+        // Strip color codes before parsing
+        String cleanItemName = org.bukkit.ChatColor.stripColor(itemName);
+        
+        ItemStack itemStack = Odd.getFromString(cleanItemName);
 
         if (itemStack != null) {
             return itemStack;
         }
 
-        String[] split = Iterables.toArray(Splitter.onPattern(":|-|#").trimResults().split(itemName), String.class);
+        String[] split = Iterables.toArray(Splitter.onPattern(":|-|#").trimResults().split(cleanItemName), String.class);
 
         Material material = getMaterial(split[0]);
-        short durability = getDurability(itemName);
+        short durability = getDurability(cleanItemName);
 
         if (material == null) {
             if (!split[0].contains(" ")) {
@@ -179,7 +182,7 @@ public class MaterialUtil {
         itemStack = new ItemStack(material);
         itemStack.setDurability(durability);
 
-        ItemMeta meta = getMetadata(itemName);
+        ItemMeta meta = getMetadata(cleanItemName);
 
         if (meta != null) {
             itemStack.setItemMeta(meta);

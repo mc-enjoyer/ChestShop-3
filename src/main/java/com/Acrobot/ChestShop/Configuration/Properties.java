@@ -152,4 +152,14 @@ public class Properties {
     @PrecededBySpace
     @ConfigurationComment("How much Heroes exp should people get for creating a ChestShop?")
     public static double HEROES_EXP = 100;
+
+    @PrecededBySpace
+    @ConfigurationComment("Enable stock color indicators on ChestShop signs (green = in stock, red = out of stock)")
+    public static boolean ENABLE_STOCK_COLOR_INDICATORS = true;
+
+    @ConfigurationComment("How often to update stock colors for all signs (in minutes)")
+    public static double STOCK_COLOR_UPDATE_INTERVAL = 0.5;
+
+    @ConfigurationComment("How many signs to update per batch during periodic updates (to prevent lag)")
+    public static int STOCK_COLOR_BATCH_SIZE = 10;
 }

@@ -67,7 +67,7 @@ public class uBlock {
             Sign sign = (Sign) faceBlock.getState();
 
             if (ChestShopSign.isValid(sign) && signIsAttachedToBlock(sign, block)) {
-                if (!sign.getLine(0).equals(originalName)) {
+                if (!com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(sign.getLine(0)).equals(originalName)) {
                     return sign;
                 } else if (ownerShopSign == null) {
                     ownerShopSign = sign;

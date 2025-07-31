@@ -25,7 +25,7 @@ public class ItemChecker implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public static void onPreShopCreation(PreShopCreationEvent event) {
-        String itemCode = event.getSignLine(ITEM_LINE);
+        String itemCode = com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(event.getSignLine(ITEM_LINE));
         ItemStack item = MaterialUtil.getItem(itemCode);
 
         if (Odd.getFromString(itemCode) != null) {

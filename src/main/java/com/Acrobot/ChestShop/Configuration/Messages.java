@@ -7,7 +7,7 @@ import org.bukkit.ChatColor;
  * @author Acrobot
  */
 public class Messages {
-    public static String prefix = ChatColor.GREEN + "[Shop] " + ChatColor.RESET;
+    public static String prefix = "";
     public static String iteminfo = ChatColor.GREEN + "Item Information: " + ChatColor.RESET;
 
     @PrecededBySpace
