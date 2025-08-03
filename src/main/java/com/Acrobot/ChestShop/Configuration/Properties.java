@@ -15,7 +15,7 @@ public class Properties {
 
     @PrecededBySpace
     @ConfigurationComment("(In 1/1000th of a second) How often can a player use the shop sign?")
-    public static int SHOP_INTERACTION_INTERVAL = 250;
+    public static int SHOP_INTERACTION_INTERVAL = 100;
 
     @ConfigurationComment("Do you want to allow using shops to people in creative mode?")
     public static boolean IGNORE_CREATIVE_MODE = true;
@@ -28,6 +28,13 @@ public class Properties {
 
     @ConfigurationComment("What can you do by clicking shift with SHIFT_SELLS_IN_STACKS turned on? (ALL/BUY/SELL)")
     public static String SHIFT_ALLOWS = "ALL";
+
+    @PrecededBySpace
+    @ConfigurationComment("Enable bulk buy/sell feature with shift-click (buys max affordable or max inventory space)")
+    public static boolean ENABLE_BULK_FEATURE = true;
+
+    @ConfigurationComment("Cooldown for bulk transactions in seconds")
+    public static int BULK_COOLDOWN_SECONDS = 5;
 
     @ConfigurationComment("Can shop's chest be opened by owner with right-clicking a shop's sign?")
     public static boolean ALLOW_SIGN_CHEST_OPEN = true;

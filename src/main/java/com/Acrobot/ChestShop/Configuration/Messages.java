@@ -66,6 +66,7 @@ public class Messages {
 
     @PrecededBySpace
     public static String CANNOT_CREATE_SHOP_HERE = "You can't create shop here!";
+    public static String BULK_TRANSACTION_COOLDOWN = "Please wait before using bulk transactions again!";
 
     public static String prefix(String message) {
         return prefix + message;

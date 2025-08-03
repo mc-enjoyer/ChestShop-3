@@ -66,7 +66,12 @@ public class PlayerInteract implements Listener {
             return;
         }
 
-        if (!isSign(block) || player.getItemInHand().getType() == Material.SIGN) { // Blocking accidental sign edition
+        if (!isSign(block)) {
+            return;
+        }
+        
+        // Only block sign editing, not shop interactions
+        if (player.getItemInHand().getType() == Material.SIGN) {
             return;
         }
 

@@ -27,6 +27,7 @@ import com.Acrobot.ChestShop.Listeners.PostShopCreation.SignSticker;
 import com.Acrobot.ChestShop.Listeners.PostTransaction.*;
 import com.Acrobot.ChestShop.Listeners.PreShopCreation.*;
 import com.Acrobot.ChestShop.Listeners.PreTransaction.*;
+import com.Acrobot.ChestShop.Listeners.PreTransaction.BulkTransactionListener;
 import com.Acrobot.ChestShop.Listeners.PreTransaction.ErrorMessageSender;
 import com.Acrobot.ChestShop.Listeners.PreTransaction.PermissionChecker;
 import com.Acrobot.ChestShop.Listeners.ShopRemoval.ShopRefundListener;
@@ -253,6 +254,7 @@ public class ChestShop extends JavaPlugin {
         registerEvent(new ShopValidator());
         registerEvent(new SpamClickProtector());
         registerEvent(new StockFittingChecker());
+        registerEvent(new BulkTransactionListener());
     }
 
     private void registerPostTransactionEvents() {
@@ -371,11 +373,6 @@ public class ChestShop extends JavaPlugin {
         try {
             List<org.bukkit.block.Sign> validSigns = com.Acrobot.ChestShop.Utils.SignStorage.getValidSigns();
             logger.info("Loaded " + validSigns.size() + " valid ChestShop signs from storage");
-            
-            for (org.bukkit.block.Sign sign : validSigns) {
-                logger.info("Found valid shop sign at " + sign.getLocation() + 
-                    " owned by " + com.Acrobot.Breeze.Utils.SignUtil.getCleanLineSafe(sign.getLine(0)));
-            }
             
             // Update initial stock colors if enabled
             if (Properties.ENABLE_STOCK_COLOR_INDICATORS) {
