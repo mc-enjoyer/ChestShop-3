@@ -37,8 +37,21 @@ public class StockColorUpdateTask implements Runnable {
                 ChestShop.getBukkitLogger().info("Starting periodic stock color update for " + allSigns.size() + " signs");
             }
             
-            // Process current batch
-            StockColorUtil.updateSignColorsBatch(allSigns, currentBatchIndex, Properties.STOCK_COLOR_BATCH_SIZE);
+            // Process current batch on main thread to avoid ConcurrentModificationException
+            final int startIndex = currentBatchIndex;
+            final int batchSize = Properties.STOCK_COLOR_BATCH_SIZE;
+            final List<Sign> signsToUpdate = allSigns;
+            
+            ChestShop.getBukkitServer().getScheduler().runTask(ChestShop.getPlugin(), new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        StockColorUtil.updateSignColorsBatch(signsToUpdate, startIndex, batchSize);
+                    } catch (Exception e) {
+                        ChestShop.getBukkitLogger().severe("Error updating sign colors in batch: " + e.getMessage());
+                    }
+                }
+            });
             
             currentBatchIndex += Properties.STOCK_COLOR_BATCH_SIZE;
             

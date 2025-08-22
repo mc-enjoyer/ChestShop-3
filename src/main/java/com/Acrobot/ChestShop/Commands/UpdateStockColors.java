@@ -5,6 +5,7 @@ import com.Acrobot.ChestShop.Configuration.Messages;
 import com.Acrobot.ChestShop.Configuration.Properties;
 import com.Acrobot.ChestShop.Permission;
 import com.Acrobot.ChestShop.Utils.StockColorUtil;
+import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -31,28 +32,18 @@ public class UpdateStockColors implements CommandExecutor {
         
         sender.sendMessage(Messages.prefix("Updating stock colors for all ChestShop signs..."));
         
-        // Run the update asynchronously to avoid blocking the main thread
-        ChestShop.getBukkitServer().getScheduler().runTaskAsynchronously(ChestShop.getPlugin(), new Runnable() {
+        // Run the update on main thread to avoid ConcurrentModificationException
+        ChestShop.getBukkitServer().getScheduler().runTask(ChestShop.getPlugin(), new Runnable() {
             @Override
             public void run() {
                 try {
                     StockColorUtil.updateAllSignColors();
                     
-                    // Send completion message on main thread
-                    ChestShop.getBukkitServer().getScheduler().runTask(ChestShop.getPlugin(), new Runnable() {
-                        @Override
-                        public void run() {
-                            sender.sendMessage(Messages.prefix("Stock color update completed successfully!"));
-                        }
-                    });
+                    // Send completion message
+                    sender.sendMessage(Messages.prefix("Stock color update completed successfully!"));
                 } catch (Exception e) {
-                    // Send error message on main thread
-                    ChestShop.getBukkitServer().getScheduler().runTask(ChestShop.getPlugin(), new Runnable() {
-                        @Override
-                        public void run() {
-                            sender.sendMessage(Messages.prefix("Error updating stock colors: " + e.getMessage()));
-                        }
-                    });
+                    // Send error message
+                    sender.sendMessage(Messages.prefix("Error updating stock colors: " + e.getMessage()));
                 }
             }
         });
