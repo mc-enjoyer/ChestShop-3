@@ -57,6 +57,11 @@ public class StockColorUtil {
             return;
         }
         
+        // Check if the chunk is loaded before updating the sign
+        if (!sign.getWorld().isChunkLoaded(sign.getX() >> 4, sign.getZ() >> 4)) {
+            return;
+        }
+        
         boolean hasStock = hasStock(sign);
         ChatColor color = hasStock ? ChatColor.GREEN : ChatColor.RED;
         
