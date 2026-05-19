@@ -9,6 +9,12 @@
     <version>3.7.9</version>
     <description>Chest-and-sign shop plugin for Bukkit</description>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
     <scm>
         <connection>scm:git:git://github.com/Acrobot/ChestShop-3</connection>
         <developerConnection>scm:git:ssh://git@github.com/Acrobot/ChestShop-3.git</developerConnection>
@@ -68,11 +74,13 @@
             <groupId>com.griefcraft.lwc</groupId>
             <artifactId>lwc</artifactId>
             <version>4.3.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.daemitus.deadbolt</groupId>
             <artifactId>deadbolt</artifactId>
             <version>2.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>
@@ -92,6 +100,7 @@
             <groupId>com.webkonsept.bukkit.simplechestlock</groupId>
             <artifactId>simplechestlock</artifactId>
             <version>1.2.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.yi.acru.bukkit.lockette</groupId>
@@ -110,19 +119,26 @@
     </dependencies>
 
     <build>
+        <finalName>ChestShop-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
                 <configuration>
-                    <finalName>ChestShop-${project.version}</finalName>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.1</version>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -130,6 +146,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
                                     <pattern>org.mcstats</pattern>

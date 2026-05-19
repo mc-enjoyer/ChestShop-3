@@ -87,6 +87,9 @@ public class ChestShop extends JavaPlugin {
         // Initialize sign storage system
         com.Acrobot.ChestShop.Utils.SignStorage.initialize();
         
+        // Initialize SELL ALL storage system
+        com.Acrobot.ChestShop.Utils.SellAllStorage.initialize();
+        
         // Load all saved signs on startup
         loadSavedSigns();
 
@@ -130,6 +133,9 @@ public class ChestShop extends JavaPlugin {
         
         // Start stock color update task
         com.Acrobot.ChestShop.Listeners.StockColorUpdateTask.startTask();
+        
+        // Start SELL ALL checking task
+        com.Acrobot.ChestShop.Listeners.SellAllManager.startTask();
     }
 
     public static File loadFile(String string) {
@@ -171,6 +177,9 @@ public class ChestShop extends JavaPlugin {
         
         // Stop stock color update task
         com.Acrobot.ChestShop.Listeners.StockColorUpdateTask.stopTask();
+        
+        // Stop SELL ALL checking task
+        com.Acrobot.ChestShop.Listeners.SellAllManager.stopTask();
 
         if (handler != null) {
             handler.close();
@@ -206,6 +215,7 @@ public class ChestShop extends JavaPlugin {
         registerEvent(new ShortNameSaver());
         registerEvent(new com.Acrobot.ChestShop.Listeners.SignStorageListener());
         registerEvent(new com.Acrobot.ChestShop.Listeners.StockColorListener());
+        registerEvent(new com.Acrobot.ChestShop.Listeners.SellAllManager());
 
         if (!Properties.TURN_OFF_HOPPER_PROTECTION) {
             registerEvent(new ItemMoveListener());

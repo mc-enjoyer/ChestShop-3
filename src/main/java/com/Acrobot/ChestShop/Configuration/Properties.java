@@ -169,4 +169,11 @@ public class Properties {
 
     @ConfigurationComment("How many signs to update per batch during periodic updates (to prevent lag)")
     public static int STOCK_COLOR_BATCH_SIZE = 10;
+
+    @PrecededBySpace
+    @ConfigurationComment("Sellable items for SELL ALL signs. Format: MaterialName:PricePerOne (Example: DIAMOND:100.0,IRON_INGOT:5.0,GOLD_INGOT:10.0)")
+    public static String SELLABLE_ITEMS = "DIAMOND:100.0,IRON_INGOT:5.0,GOLD_INGOT:10.0";
+
+    @ConfigurationComment("How often to check SELL ALL signs for sellable items (in seconds)")
+    public static int SELL_ALL_CHECK_INTERVAL = 30;
 }

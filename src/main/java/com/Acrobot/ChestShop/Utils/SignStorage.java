@@ -129,8 +129,16 @@ public class SignStorage {
         List<Location> locations = loadSigns();
         
         for (Location location : locations) {
-            if (location.getWorld() == null) continue;
-            
+            if (location.getWorld() == null) {
+                continue;
+            }
+
+            int chunkX = location.getBlockX() >> 4;
+            int chunkZ = location.getBlockZ() >> 4;
+            if (!location.getWorld().isChunkLoaded(chunkX, chunkZ)) {
+                continue;
+            }
+
             if (location.getBlock().getState() instanceof Sign) {
                 Sign sign = (Sign) location.getBlock().getState();
                 if (ChestShopSign.isValid(sign)) {
